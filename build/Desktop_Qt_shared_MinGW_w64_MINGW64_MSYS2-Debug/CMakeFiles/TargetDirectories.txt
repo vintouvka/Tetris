@@ -1,9 +1,0 @@
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/tetris.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/edit_cache.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/list_install_components.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/install.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/install/local.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/install/strip.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/tetris_autogen_timestamp_deps.dir
-C:/Users/natal/Myit dekstop/C++/pr2/tetris/tetris/build/Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/CMakeFiles/tetris_autogen.dir
