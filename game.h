@@ -26,6 +26,7 @@ public slots:
     void rotate();
     void drop();
     void landCurrentTetromino();
+    void resetGame();
 private:
     std::vector<std::vector<QGraphicsRectItem*>> blockItems;
     QGraphicsTextItem* scoreTextItem;
@@ -38,6 +39,9 @@ private:
     void spawnTetromino();
     int score;
     void clearFullRows();
+
+signals:
+    void tryAgainRequested();
 
 };
 

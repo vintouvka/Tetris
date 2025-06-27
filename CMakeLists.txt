@@ -28,6 +28,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         constants.h
         startscene.h
         startscene.cpp
+        gameoverscene.h gameoverscene.cpp
+        resources.qrc
+        resources.qrc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET tetris APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

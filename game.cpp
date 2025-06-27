@@ -1,4 +1,5 @@
 #include "game.h"
+#include "gameoverscene.h"
 #include <QEvent>
 #include <QKeyEvent>
 #include "tetromino.h"
@@ -9,6 +10,10 @@
 #include <QDebug>
 #include <QGraphicsRectItem>
 #include <QGraphicsItemGroup>
+#include <windows.h>
+#include <mmsystem.h>
+
+#pragma comment(lib, "winmm.lib")
 
 Game::Game(QGraphicsScene* scene, QGraphicsTextItem* scoreText, QObject* parent)
     : QObject(parent),
@@ -21,14 +26,15 @@ Game::Game(QGraphicsScene* scene, QGraphicsTextItem* scoreText, QObject* parent)
 {
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Game::update);
-
     board.resize(rows, std::vector<int>(cols, 0));
     blockItems.resize(rows, std::vector<QGraphicsRectItem*>(cols, nullptr));
-
     nextTetromino = new Tetromino(scene);
 }
 
 void Game::start() {
+   mciSendString(L"open \"C:/Users/natal/Downloads/duriggame.wav\" type mpegvideo alias bgmusic", nullptr, 0, nullptr);
+    mciSendString(L"play bgmusic repeat", nullptr, 0, nullptr);
+
     spawnTetromino();
     timer->start(500);
 }
@@ -85,6 +91,7 @@ void Game::moveLeft() {
     if (currentTetromino)
         currentTetromino->moveLeft(board);
 }
+
 void Game::moveRight() {
     if (currentTetromino)
         currentTetromino->moveRight(board);
@@ -110,7 +117,6 @@ void Game::spawnTetromino() {
     currentTetromino->resetPosition();
 
     nextTetromino = new Tetromino(scene);
-
     if (nextTetromino) {
         nextTetromino->previewAt(12 * TILE_SIZE + 47, 160);
     }
@@ -130,6 +136,8 @@ void Game::landCurrentTetromino() {
             }
         }
     }
+
+    PlaySoundW(L"C:/Users/natal/Downloads/click-47609.wav", nullptr, SND_FILENAME | SND_ASYNC);
 }
 
 bool Game::isGameOver() const {
@@ -139,25 +147,50 @@ bool Game::isGameOver() const {
     }
     return false;
 }
+
 void Game::showGameOver() {
+    mciSendString(L"stop bgmusic", nullptr, 0, nullptr);
+    mciSendString(L"close bgmusic", nullptr, 0, nullptr);
+
     gameOverFlag = true;
-    QGraphicsTextItem* gameOverText = new QGraphicsTextItem("Game over");
-    QFont font("Arial", 35, QFont::Bold);
-    gameOverText->setFont(font);
-    gameOverText->setDefaultTextColor(Qt::red);
-    QRectF textRect = gameOverText->boundingRect();
-    QGraphicsRectItem* background = new QGraphicsRectItem(textRect);
-    background->setBrush(QBrush(Qt::black));
-    background->setOpacity(0.7);
+    scene->clear();
+    QGraphicsRectItem* background = new QGraphicsRectItem(0, 0, scene->width(), scene->height());
+    background->setBrush(QBrush(QColor(10, 10, 60)));
     background->setPen(Qt::NoPen);
-    QGraphicsItemGroup* group = new QGraphicsItemGroup;
-    group->addToGroup(background);
-    group->addToGroup(gameOverText);
-    QRectF groupRect = group->boundingRect();
-    group->setPos(scene->width() / 2 - groupRect.width() / 2,
-                  scene->height() / 2 - groupRect.height() / 2);
-    scene->addItem(group);
+    scene->addItem(background);
+    GameOverScene* gameOver = new GameOverScene(score);
+    connect(gameOver, &GameOverScene::tryAgainClicked, this, [this]() {
+        emit tryAgainRequested();
+    });
+    for (QGraphicsItem* item : gameOver->items()) {
+        scene->addItem(item);
+    }
+    PlaySoundW(L"C:\\Users\\natal\\Downloads\\gameover.wav", nullptr, SND_FILENAME | SND_ASYNC);
 }
+
+
+void Game::resetGame() {
+    scene->clear();
+    board = std::vector<std::vector<int>>(rows, std::vector<int>(cols, 0));
+    blockItems = std::vector<std::vector<QGraphicsRectItem*>>(rows, std::vector<QGraphicsRectItem*>(cols, nullptr));
+    score = 0;
+    scoreTextItem->setPlainText("0");
+    gameOverFlag = false;
+
+    if (currentTetromino) {
+        delete currentTetromino;
+        currentTetromino = nullptr;
+    }
+    if (nextTetromino) {
+        delete nextTetromino;
+        nextTetromino = nullptr;
+    }
+
+    scene->addItem(scoreTextItem);
+    nextTetromino = new Tetromino(scene);
+    start();
+}
+
 void Game::clearFullRows() {
     std::vector<int> fullRows;
     for (int row = 0; row < rows; ++row) {
@@ -172,38 +205,29 @@ void Game::clearFullRows() {
             fullRows.push_back(row);
     }
 
-    if(fullRows.empty())
+    if (fullRows.empty())
         return;
 
     score += 40 * fullRows.size();
     scoreTextItem->setPlainText(QString::number(score));
+    PlaySoundW(L"C:/Users/natal/Downloads/clearrow.wav", nullptr, SND_FILENAME | SND_ASYNC);
     std::vector<std::vector<int>> newBoard(rows, std::vector<int>(cols, 0));
     std::vector<std::vector<QGraphicsRectItem*>> newBlockItems(rows, std::vector<QGraphicsRectItem*>(cols, nullptr));
 
     int newRow = rows - 1;
     for (int row = rows - 1; row >= 0; --row) {
-
-        bool isFull = false;
-        for (int i = 0; i < fullRows.size(); ++i) {
-            if (row == fullRows[i]) {
-                isFull = true;
-
-                for (int col = 0; col < cols; ++col) {
-                    if (blockItems[row][col]) {
-                        scene->removeItem(blockItems[row][col]);
-                        delete blockItems[row][col];
-                        blockItems[row][col] = nullptr;
-                    }
+        bool isFull = std::find(fullRows.begin(), fullRows.end(), row) != fullRows.end();
+        if (isFull) {
+            for (int col = 0; col < cols; ++col) {
+                if (blockItems[row][col]) {
+                    scene->removeItem(blockItems[row][col]);
+                    delete blockItems[row][col];
+                    blockItems[row][col] = nullptr;
                 }
-                break;
             }
-        }
-        if (!isFull) {
-
+        } else {
             newBoard[newRow] = board[row];
             newBlockItems[newRow] = blockItems[row];
-
-
             for (int col = 0; col < cols; ++col) {
                 if (newBlockItems[newRow][col]) {
                     newBlockItems[newRow][col]->setPos(col * TILE_SIZE, newRow * TILE_SIZE);
@@ -212,12 +236,7 @@ void Game::clearFullRows() {
             newRow--;
         }
     }
-    for (int row = newRow; row >= 0; --row) {
-        for (int col = 0; col < cols; ++col) {
-            newBoard[row][col] = 0;
-            newBlockItems[row][col] = nullptr;
-        }
-    }
+
     board = newBoard;
     blockItems = newBlockItems;
 }

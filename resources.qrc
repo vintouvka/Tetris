@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/sounds">
+        <file>resources/clearrow.wav</file>
+        <file>resources/click-47609.wav</file>
+        <file>resources/didj-button-sound.wav</file>
+        <file>resources/duriggame.wav</file>
+        <file>resources/gameover.wav</file>
+    </qresource>
+</RCC>
