@@ -2,20 +2,18 @@
 #define STARTSCENE_H
 
 #include <QGraphicsScene>
-#include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QPushButton>
+#include <QGraphicsView>
 #include <QTimer>
 #include <QList>
-
-
-
 
 class StartScene : public QGraphicsScene {
     Q_OBJECT
 
 public:
-    explicit StartScene(QObject* parent = nullptr);
+    explicit StartScene(QGraphicsView* parentView, QObject* parent = nullptr);
     bool startClicked = false;
 
 signals:
@@ -25,19 +23,15 @@ private slots:
     void animateBlocks();
 
 private:
-    QGraphicsRectItem* startButton;
+    QPushButton* startButton = nullptr;
+    QGraphicsView* view = nullptr;
     QList<QGraphicsRectItem*> decorativeBlocks;
     QList<int> blockDirections;
-    QTimer* animationTimer;
-
+    QTimer* animationTimer = nullptr;
 
     void createTitle();
     void createStartButton();
     void createDecorativeBlocks();
-
-
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 };
 
 #endif // STARTSCENE_H

@@ -4,10 +4,12 @@
 #include <QObject>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
-#include <QVector>
+#include <QGraphicsRectItem>
+#include <QTimer>
 #include <vector>
 #include "tetromino.h"
 #include "constants.h"
+#include "pausescene.h"
 
 class Game : public QObject
 {
@@ -27,22 +29,27 @@ public slots:
     void drop();
     void landCurrentTetromino();
     void resetGame();
-private:
-    std::vector<std::vector<QGraphicsRectItem*>> blockItems;
-    QGraphicsTextItem* scoreTextItem;
-    bool gameOverFlag;
-    std::vector<std::vector<int>> board;
-    QGraphicsScene* scene;
-    Tetromino* currentTetromino;
-    Tetromino* nextTetromino;
-    QTimer* timer;
-    void spawnTetromino();
-    int score;
-    void clearFullRows();
-
+    void pauseGame();
+    void resumeGame();
+    void quitGame();
 signals:
     void tryAgainRequested();
 
+private:
+    QGraphicsScene* gameScene;
+    PauseScene* pauseScene{nullptr};
+    QGraphicsTextItem* scoreTextItem;
+    Tetromino* currentTetromino{nullptr};
+    Tetromino* nextTetromino{nullptr};
+    std::vector<std::vector<QGraphicsRectItem*>> blockItems;
+    std::vector<std::vector<int>>           board;
+    QTimer* timer{nullptr};
+    bool gameOverFlag{false};
+    bool paused{false};
+    int score{0};
+    void spawnTetromino();
+    void clearFullRows();
 };
 
 #endif // GAME_H
+

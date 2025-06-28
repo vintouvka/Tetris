@@ -1,18 +1,18 @@
 #include "startscene.h"
 #include <QBrush>
 #include <QFont>
-#include <QGraphicsView>
 #include <QGraphicsTextItem>
 #include <QPropertyAnimation>
 #include <QTimer>
-#include <QGraphicsSceneMouseEvent>
-#include "constants.h"
+#include <QPushButton>
 #include <windows.h>
 #include <mmsystem.h>
+#include "constants.h"
 #pragma comment(lib, "winmm.lib")
 
-StartScene::StartScene(QObject* parent)
-    : QGraphicsScene(0, 0, fieldWidth + panelWidth, fieldHeight), startButton(nullptr)
+StartScene::StartScene(QGraphicsView* parentView, QObject* parent)
+    : QGraphicsScene(0, 0, fieldWidth + panelWidth, fieldHeight, parent),
+    view(parentView)
 {
     setBackgroundBrush(QColor(10, 10, 60));
     createTitle();
@@ -46,17 +46,29 @@ void StartScene::createTitle() {
     pulseAnim->setLoopCount(-1);
     pulseAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
-
 void StartScene::createStartButton() {
-    startButton = addRect(0, 0, 200, 60, Qt::NoPen, QColor(0, 200, 0));
-    startButton->setPos(width() / 2 - 100, height() / 2 - 30);
+    startButton = new QPushButton("START", view);
+    startButton->setObjectName("startButton");
+    startButton->setFixedSize(200, 60);
+    startButton->setStyleSheet(
+        "background-color: rgb(0, 200, 0);"
+        "color: black;"
+        "font: bold 20px 'Courier';"
+        "border-radius: 5px;"
+        );
+    startButton->move(view->width() / 2 - 100, view->height() / 2 - 30);
+    startButton->setFocusPolicy(Qt::NoFocus);
+    startButton->show();
 
-    QGraphicsTextItem* text = addText("START");
-    text->setDefaultTextColor(Qt::black);
-    text->setFont(QFont("Courier", 20, QFont::Bold));
-    text->setPos(startButton->x() + 50, startButton->y() + 10);
+    connect(startButton, &QPushButton::clicked, this, [=]() {
+        startButton->hide();
+        PlaySound(
+            TEXT("C:/Users/natal/Downloads/didj-button-sound.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
+        startClicked = true;
+        emit startGame();
+    });
 }
-
 void StartScene::createDecorativeBlocks() {
     int baseY = height() - 100;
     for (int i = 0; i < 7; ++i) {
@@ -67,7 +79,6 @@ void StartScene::createDecorativeBlocks() {
         blockDirections.append((i % 2 == 0) ? 1 : -1);
     }
 }
-
 void StartScene::animateBlocks() {
     for (int i = 0; i < decorativeBlocks.size(); ++i) {
         QGraphicsRectItem* block = decorativeBlocks[i];
@@ -81,14 +92,4 @@ void StartScene::animateBlocks() {
             blockDirections[i] *= -1;
         }
     }
-}
-
-void StartScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    if (startButton->contains(event->scenePos() - startButton->pos())) {
-        PlaySound(TEXT("C:/Users/natal/Downloads/didj-button-sound.wav"), NULL, SND_FILENAME | SND_ASYNC);
-
-        startClicked = true;
-        emit startGame();
-    }
-    QGraphicsScene::mousePressEvent(event);
 }

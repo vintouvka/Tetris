@@ -3,16 +3,17 @@
 
 #include <QGraphicsScene>
 #include <QPushButton>
-
-class GameOverScene : public QGraphicsScene
-{
+#include <QGraphicsView>
+class GameOverScene : public QGraphicsScene {
     Q_OBJECT
-
 public:
     explicit GameOverScene(int finalScore, QObject* parent = nullptr);
-
 signals:
     void tryAgainClicked();
+private:
+    QPushButton*    tryAgainButton = nullptr;
+    QGraphicsView*  view           = nullptr;
+    void setupTryAgainButton();
 };
 
 #endif // GAMEOVERSCENE_H
