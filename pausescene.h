@@ -3,6 +3,9 @@
 
 #include <QGraphicsScene>
 #include <QPushButton>
+#include <QSoundEffect>
+
+class QGraphicsView;
 
 class PauseScene : public QGraphicsScene {
     Q_OBJECT
@@ -17,6 +20,10 @@ signals:
 private:
     QPushButton* resumeBtn{nullptr};
     QPushButton* quitBtn{nullptr};
+    QPushButton* pausedBtn;
+    QSoundEffect* resumeEffect{nullptr};
+    QSoundEffect* quitEffect{nullptr};
+    QSoundEffect* clickEffect{nullptr};
 };
 
 #endif // PAUSESCENE_H
