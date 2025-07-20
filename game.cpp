@@ -74,6 +74,8 @@ void Game::update() {
 
 bool Game::eventFilter(QObject* obj, QEvent* event) {
     if (event->type() == QEvent::KeyPress) {
+        if (paused)
+            return true;
         auto key = static_cast<QKeyEvent*>(event);
         if (gameOverFlag &&
             (key->key() == Qt::Key_Left ||
@@ -94,6 +96,7 @@ bool Game::eventFilter(QObject* obj, QEvent* event) {
     }
     return QObject::eventFilter(obj, event);
 }
+
 
 void Game::moveLeft() {
     if (currentTetromino) currentTetromino->moveLeft(board);
